@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 import {AngularFireAuth} from 'angularfire2/auth'
+import {AngularFireDatabase, AngularFireObject} from 'angularfire2/database'
+import { Profile } from '../../models/profile';
 
 /**
  * Generated class for the HomePage page.
@@ -16,7 +18,9 @@ import {AngularFireAuth} from 'angularfire2/auth'
 })
 export class HomePage {
 
-  constructor(private afAuth: AngularFireAuth, private toast: ToastController,
+  profileData: AngularFireObject<Profile>;
+
+  constructor(private afAuth: AngularFireAuth, private afDatabase: AngularFireDatabase, private toast: ToastController,
     public navCtrl: NavController, public navParams: NavParams) {
   }
 
@@ -24,9 +28,11 @@ export class HomePage {
     this.afAuth.authState.subscribe(data =>{
       if(data && data.email && data.uid){
       this.toast.create({
-        message: 'Bem vindo ao TROCA ESTE JOGO, ${data.email}',
+        message: `Bem vindo ao TROCA ESTE JOGO, ${data.email}`,
         duration: 3000
       }).present();
+
+      this.profileData = this.afDatabase.object(`profile/${data.uid}`);
     }
     else{
       this.toast.create({
